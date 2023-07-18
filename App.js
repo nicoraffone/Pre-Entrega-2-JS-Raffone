@@ -1,3 +1,5 @@
+const shoppingCart = [];
+
 function buy(){
     let productType = 0;
     let selectedType = null;
@@ -12,14 +14,17 @@ function buy(){
             `4: Inyeccion\n` +
             `5: Lubricantes\n`
             ));
-
-        selectedType = products.filter(product => product.type === productType)
-    };
-    
-    console.log(selectedType);
+        
+            
+            selectedType = products.filter(product => product.type === productType)
+            
+            if(!(productType === 1 || productType === 2 || productType === 3 || productType === 4 || productType === 5)){
+                alert('Ingrese un numero valido.')
+                selectedType = null;
+            };
+        };
 
     let category = selectedType.map(selectedType => selectedType.type);
-    //console.log(category[0]);
 
     switch(category[0]) {
         case 1:
@@ -63,33 +68,52 @@ function buy(){
     let productId = parseInt(prompt(`
     Usted ha elegido la categoria de: ${category}`));
 
-    //console.log(productId);
-
     let selectedProduct = products.find(product => product.id === productId)
 
     let productAmount = 0;
     while(productAmount === 0 || !productAmount){
-        productAmount = parseInt(prompt(`Usted ha elegido: ${selectedProduct.name}\n Su valor es de: $${selectedProduct.price} por unidad\n Disponemos de un stock de: ${selectedProduct.stock} unidades\n Indique la cantidad requerida:`))
+        productAmount = parseInt(prompt(`Usted ha elegido: ${selectedProduct.name}\n Su valor es de: $${selectedProduct.price} por unidad.\n Indique la cantidad requerida:`))
     }
 
+// FUNCION PARA AGREGAR AL CARRITO
+    const addToCart = (product, productAmount) => {
+        const productId = product.id;
+        const repeatedProduct = shoppingCart.find(product => product.id == productId);
+        if(!repeatedProduct){
+            product.amount += productAmount;
+            shoppingCart.push(product)
+        } else{
+            repeatedProduct.amount += productAmount;
+        }
+    };
+
+// AGREGAR AL CARRITO SI EL USUARIO ACEPTA.
+    let confirmAdd = confirm('Desea agregar al carrito?');
+    if(confirmAdd){
+        addToCart(selectedProduct, productAmount);
+    };
+
+    let buyAgain = confirm('Desea comprar mas productos?');
+
+    if(!buyAgain){
+        alert('Procedemos con el pago.')
+    } else{buy()};
+
     const order = new Order(selectedProduct.name, selectedProduct.price, productAmount);
-    console.log(selectedProduct.price);
     return order
 };
 
 const order = buy();
-order.priceTotal();
 
-alert(`
-Gracias por su compra. Factura detallada: \n
-- ${order.product} x ${order.amount}:     $${order.total} (Iva incluido).\n
-- Pagando en efectivo usted tiene un 15% de Dto y el total seria de $${order.getDiscount()}
-`);
+// FUNCION PARA CALCULAR EL PRECIO TOTAL DE TODOS LOS PRODUCTOS INCLUIDOS EN EL CARRITO.
+const totalPrice = shoppingCart.reduce((acc, product) => {
+    return acc + product.price * product.amount;
+    },0);
 
-confirm('Desea realizar otra compra?');
+// FUNCION PARA DETALLAR CADA PRODUCTO EN EL CARRITO CON SUS CANTIDADES ELEGIDAS.
+const list = shoppingCart.map((product) => {
+    return `\n- ${product.name}:   ${product.amount} Unidades.`
+});
 
-if(!confirm){
-    alert('Muchas gracias, hasta pronto!')
-} else{
-    buy()
-}
+alert(`El total de su compra sería de: $${totalPrice} Pesos\n Si usted desea pagar en efectivo tiene un 15% de descuento y quedaria en un total de: $${totalPrice * 0.85} Pesos\n
+-Los productos en un carrito son los siguientes:\n${list}`);
