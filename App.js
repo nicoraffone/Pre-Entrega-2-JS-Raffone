@@ -1,5 +1,7 @@
 const shoppingCart = [];
 
+alert('Bienvenido a la tienda de respuestos de competición. Siga los pasos para hacer su pedido!')
+
 function buy(){
     let productType = 0;
     let selectedType = null;
@@ -116,4 +118,4 @@ const list = shoppingCart.map((product) => {
 });
 
 alert(`El total de su compra sería de: $${totalPrice} Pesos\n Si usted desea pagar en efectivo tiene un 15% de descuento y quedaria en un total de: $${totalPrice * 0.85} Pesos\n
--Los productos en un carrito son los siguientes:\n${list}`);
+-Los productos en el carrito son los siguientes:\n${list}`);
